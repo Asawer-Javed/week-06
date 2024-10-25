@@ -1,0 +1,49 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Change this to your default branch if it's different
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Specify the Node.js version
+
+      - name: Install dependencies
+        run: |
+          cd my-app
+          npm install
+          cd ../server
+          npm install
+
+      - name: Run tests
+        run: |
+          cd my-app
+          npm test
+
+      - name: Build the frontend
+        run: |
+          cd my-app
+          npm run build
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t my-app .
+          # Optional: Push the image to Docker Hub or any other registry
+          # docker tag my-app <your-dockerhub-username>/my-app
+          # echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+          # docker push <your-dockerhub-username>/my-app
+
+      - name: Deploy to production (optional)
+        run: |
+          # Add your deployment scripts here
+          echo "Deploying to production..."
